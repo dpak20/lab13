@@ -72,11 +72,10 @@ public class FamilyTree
             // draw a tree, mark any leaf node, and then mark its ancestors in order from
             // recent to ancient. Expect a question about this on the final exam.
 			
-			for (int i = 0; i < ancestors.size(); i++) {
-				ancestors.add(currNode.collectAncestorsToList());
-				currNode = currNode.parent;
+			while(parent.parent != null) {
+				ancestors.add(parent);
+				parent = parent.parent;
 			}
-
             return ancestors;
         }
         
@@ -119,8 +118,8 @@ public class FamilyTree
 
 		// Parse the input file. Create a FileReader that reads treeFile. Create a BufferedReader
 		// that reads from the FileReader.
-		FileReader fr = treeFile;
-		BufferedReader br = fr;
+		FileReader fr = new FileReader(treeFile);
+		BufferedReader br = new BufferedReader(fr);
 		String line;
 		while ((line = br.readLine()) != null)
 			addLine(line);
@@ -136,26 +135,27 @@ public class FamilyTree
 	private void addLine(String line) throws TreeException
 	{
 		// Extract parent and array of children.
-		int colonIndex = childrenString.indexOf(":"); 
+		int colonIndex = line.indexOf(":"); 
 		if (colonIndex < 0) {
-			throw new TreeException ("bruh moment");
+			throw new TreeException ("Colon index");
 		} //throw a TreeException with a useful message
-		String parent = childrenString.substring(0, colonIndex);
-		String childrenString = childrenString.substring(colonIndex);
+		String parentString = line.substring(0, colonIndex);
+		String childrenString = line.substring(colonIndex,line.length());
 		String[] childrenArray = childrenString.split(",");
 
 		// Find parent node. If root is null then the tree is empty and the
 		// parent node must be constructed. Otherwise the parent node should be 
 		// somewhere in the tree.
-		TreeNode parentNode;
-		if (root == null)
-			parentNode = root = new TreeNode(parent);
+		TreeNode parentNode = new TreeNode(parentString);
+		if (root == null) {
+			root = parentNode;
+		}
 		else
 		{
-			parentNode.getNodeWithName(parent);
+			parentNode.getNodeWithName(parentString);
 		}
 		for (int i = 0; i < childrenArray.length; i++) {
-			parentNode.addChild(new TreeNode(childrenString));
+			parentNode.addChild(new TreeNode(childrenArray[i]));
 		}
 	}
 	
@@ -171,11 +171,11 @@ public class FamilyTree
 		// Get nodes for input names.
 		TreeNode node1 = root.getNodeWithName(name1);
 		if (node1 == null) {
-			throw new TreeException ("bruh moment");
+			throw new TreeException ("null");
 		}
 		TreeNode node2 = root.getNodeWithName(name2);
 		if (node2 == null){
-			throw new TreeException ("bruh moment 2");
+			throw new TreeException ("second null");
 		}
 		
 		// Get ancestors of node1 and node2.
